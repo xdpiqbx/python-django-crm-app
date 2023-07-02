@@ -157,10 +157,113 @@ def home(request):
 {% block content %}
 <h1>Hello from Home page</h1>
 {% endblock %}
+```
 
+## `Login` & `Logout`
+- URLs
+```python
+urlpatterns = [
+    path('', views.home, name="home"),
+    # path('login/', views.login_user, name="login"), # I will use Home page for login
+    path('logout/', views.logout_user, name="logout"),
+]
+```
+- View.s Add to site `views.py`
+```python
+from django.core.handlers.wsgi import WSGIRequest
+from django.shortcuts import render, redirect
+from django.contrib.auth import authenticate, login, logout
+from django.contrib import messages
+
+def home(request: WSGIRequest):
+    if request.method == "POST":
+        username = request.POST["username"]
+        password = request.POST["password"]
+        user = authenticate(request, username=username, password=password)
+        if user is not None:
+            login(request, user)
+            messages.success(request, "You have logged in.")
+            return redirect('home')
+        else:
+            messages.success(request, "There was an error logging in, try again.")
+            return redirect('home')
+    else:
+        return render(request, 'home.html', {})
+
+# If you need separate login page so you need this function
+# def login_user(request):
+#     pass
+
+def logout_user(request):
+    logout(request)
+    messages.success(request, "You have been logged out.")
+    return redirect('home')
+```
+- Template `home.html`
+```html
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="col-md-6 offset-md-3">
+    {% if user.is_authenticated %}
+        <h1>Hello Username =)</h1>
+    {% else %}
+        <br>
+        <h1>Login</h1>
+        <br>
+        <form method="POST" action="{% url 'home' %}">
+          {% csrf_token %}
+          <div class="mb-3">
+            <input type="text" class="form-control" name="username" placeholder="Username" required>
+          </div>
+          <div class="mb-3">
+            <input type="password" class="form-control" name="password" placeholder="Password" required>
+          </div>
+          <button type="submit" class="btn btn-secondary">Login</button>
+        </form>
+    {% endif %}
+</div>
+{% endblock %}
+```
+
+## Registration
+- URL `path('register/', views.register_user, name="register"),`
+- View `def register_user(request: WSGIRequest): ...`
+- Template `register.html`
+
+## Django Forms
+- create file like [`forms.py`](./crm_app/website/forms.py)
+- add URL `path('register/', views.register_user, name="register"),`
+- add form to views
+```python
+def register_user(request: WSGIRequest):
+    if request.method == "POST":
+        form = SignUpForm(request.POST)
+        if form.is_valid():
+            form.save()
+            # Auth and login
+            user = authenticate(
+                username=form.cleaned_data.get('username'),
+                password=form.cleaned_data.get('password1')
+            )
+            login(request, user)
+            messages.success(request, "You have Successfully registered.")
+            return redirect('home')
+    else:
+        form = SignUpForm()
+        return render(request, 'register.html', {'form': form})
+    return render(request, 'register.html', {'form': form})
+```
+- add form to html
+```html
+<form method="POST" action="">
+  {% csrf_token %}
+    {{ form.as_p }}
+  <button type="submit" class="btn btn-secondary">Register</button>
+</form>
 ```
 
 ## Optional
 [PgBouncer (connection puller)](https://www.youtube.com/watch?v=W-nOdwlxmhA)
 
-https://youtu.be/t10QcFx7d5k?t=1730
+https://youtu.be/t10QcFx7d5k?t=4502
