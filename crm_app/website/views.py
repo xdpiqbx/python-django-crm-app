@@ -3,6 +3,7 @@ from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
 from .forms import SignUpForm
+from .models import Record
 
 def home(request: WSGIRequest):
     if request.method == "POST":
@@ -17,7 +18,9 @@ def home(request: WSGIRequest):
             messages.success(request, "There was an error logging in, try again.")
             return redirect('home')
     else:
-        return render(request, 'home.html', {})
+        records = Record.objects.all()
+        return render(request, 'home.html', {'records': records})
+        # return render(request, 'home.html', {})
 
 # If you need separate login page so you need this function
 # def login_user(request):
