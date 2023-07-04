@@ -1,6 +1,7 @@
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
 from django import forms
+from .models import Record
 
 class SignUpForm(UserCreationForm):
     email = forms.EmailField(
@@ -54,3 +55,14 @@ class SignUpForm(UserCreationForm):
         self.fields['password2'].widget.attrs['placeholder'] = 'Confirm Password'
         self.fields['password2'].label = ''
         self.fields['password2'].help_text = '<span class="form-text text-muted"><small>Enter the same password as before, for verification.</small></span>'
+
+class AddRecordForm(forms.ModelForm):
+    # first_name = models.CharField(max_length=50)
+    # last_name = models.CharField(max_length=50)
+    # email = models.forms.EmailField()
+    # phone = models.CharField(max_length=20)
+    # address = models.CharField(max_length=100)
+    # city = models.CharField(max_length=50)
+    # state = models.CharField(max_length=50)
+    # zipcode = models.CharField(max_length=20)
+    pass

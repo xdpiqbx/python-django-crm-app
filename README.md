@@ -361,10 +361,34 @@ def delete_record(request: WSGIRequest, pk: int):
     del_record.delete()
 ```
 - Template
-- 
+`<a type="button" href="{% url 'delete_record' record.id %}" class="btn btn-danger mt-3">Delete</a>`
 
+## Add record
+- URL `path('add_record/', views.add_record, name="add_record"),`
+- View:
+```python
+def add_record(request: WSGIRequest):
+    return render(request, 'add_record.html', {})
+```
+- Template
+```html
+{% extends 'base.html' %}
+{% block content %}
+    {% if user.is_authenticated %}
+        <div class="col-md-6 offset-md-3">
+            <h1>Add Record:</h1>
+            <form method="POST" action="{% url 'add_record' %}">
+                {% csrf_token %}
+                {{ form.as_p }}
+                <button type="submit" class="btn btn-secondary">Login</button>
+            </form>
+        </div>
+    {% endif %}
+{% endblock %}
+```
+- Create add form in [`forms.py`](./crm_app/website/forms.py)
 
 ## Optional
 [PgBouncer (connection puller)](https://www.youtube.com/watch?v=W-nOdwlxmhA)
 
-https://youtu.be/t10QcFx7d5k?t=7265
+https://youtu.be/t10QcFx7d5k?t=7556

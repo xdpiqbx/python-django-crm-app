@@ -66,3 +66,5 @@ def delete_record(request: WSGIRequest, pk: int):
         messages.success(request, "You must been login to to do that")
         return redirect('home')
 
+def add_record(request: WSGIRequest):
+    return render(request, 'add_record.html', {})
