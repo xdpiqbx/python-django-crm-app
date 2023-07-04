@@ -263,7 +263,108 @@ def register_user(request: WSGIRequest):
 </form>
 ```
 
+## Work with database
+- Create model in [models.py](./crm_app/website/models.py)
+```python
+from django.db import models
+
+class Record(models.Model):
+    created_at = models.DateTimeField(auto_now_add=True)
+    first_name = models.CharField(max_length=50)
+    last_name = models.CharField(max_length=50)
+    email = models.CharField(max_length=100)
+    phone = models.CharField(max_length=20)
+    address = models.CharField(max_length=100)
+    city = models.CharField(max_length=50)
+    state = models.CharField(max_length=50)
+    zipcode = models.CharField(max_length=20)
+
+    def __str__(self):  # it like .toString() method
+        return f"{self.first_name} {self.last_name}"
+```
+- Now you should create migration `python manage.py makemigrations`
+- Result is:
+```
+$ python manage.py makemigrations
+Migrations for 'website':
+  website\migrations\0001_initial.py
+    - Create model Record
+```
+- And now - migrate `python manage.py migrate` it will create table `website_record`
+```
+$ python manage.py migrate
+Operations to perform:
+  Apply all migrations: admin, auth, contenttypes, sessions, website
+Running migrations:
+  Applying website.0001_initial... OK
+```
+
+- Now we need to register model `Recortd`
+  - go to `admin.py`
+  - import your model `from .models import Record`
+  - register your model `admin.site.register(Record)`
+
+## View records on page
+- Return records from `views.py`
+```python
+records = Record.objects.all()
+return render(request, 'home.html', {'records': records})
+```
+- Render Records in html
+```html
+  {% if records %}
+      <table class="table table-striped table-hover table-bordered">
+        <thead class="table-dark">
+          <tr>
+            <th scope="col">Name</th>
+            <th scope="col">Email</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for record in records %}
+          <tr>
+              <td>{{ record.first_name }} {{ record.last_name }}</td>
+              <td>{{ record.email }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+  {% endif %}
+```
+
+## Record page by id
+- URL `path('record/<int:pk>', views.customer_record, name="record"),`
+- View:
+```python
+def customer_record(request: WSGIRequest, pk: int):
+    if request.user.is_authenticated:
+        customer_record = Record.objects.get(id=pk)
+        return render(request, 'record.html', {'record': customer_record})
+    else:
+        messages.success(request, "You must been login to view this page")
+        return redirect('home')
+```
+- Template
+```html
+<ul class="list-group list-group-flush">
+    <li class="list-group-item">{{ record.email }}</li>
+    <li class="list-group-item">{{ record.phone }}</li>
+</ul>
+```
+
+## Delete record
+- URL `path('delete_record/<int:pk>', views.delete_record, name="delete_record"),`
+- View:
+```python
+def delete_record(request: WSGIRequest, pk: int):
+    del_record = Record.objects.get(id=pk)
+    del_record.delete()
+```
+- Template
+- 
+
+
 ## Optional
 [PgBouncer (connection puller)](https://www.youtube.com/watch?v=W-nOdwlxmhA)
 
-https://youtu.be/t10QcFx7d5k?t=4502
+https://youtu.be/t10QcFx7d5k?t=7265

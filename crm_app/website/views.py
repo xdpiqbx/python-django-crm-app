@@ -47,3 +47,22 @@ def register_user(request: WSGIRequest):
         form = SignUpForm()
         return render(request, 'register.html', {'form': form})
     return render(request, 'register.html', {'form': form})
+
+def customer_record(request: WSGIRequest, pk: int):
+    if request.user.is_authenticated:
+        customer_record = Record.objects.get(id=pk)
+        return render(request, 'record.html', {'record': customer_record})
+    else:
+        messages.success(request, "You must been login to view this page")
+        return redirect('home')
+
+def delete_record(request: WSGIRequest, pk: int):
+    if request.user.is_authenticated:
+        del_record = Record.objects.get(id=pk)
+        del_record.delete()
+        messages.success(request, "Record deleted Successfully")
+        return redirect('home')
+    else:
+        messages.success(request, "You must been login to to do that")
+        return redirect('home')
+

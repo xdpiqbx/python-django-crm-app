@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+{% block content %}
+    {% if user.is_authenticated %}
+        <div class="col-md-6 offset-md-3">
+            <h1>Record:</h1>
+            <div class="card" style="width: 18rem;">
+              <div class="card-header">
+                  <b>{{ record.first_name }} {{ record.last_name }}</b>
+              </div>
+              <ul class="list-group list-group-flush">
+                <li class="list-group-item">{{ record.email }}</li>
+                <li class="list-group-item">{{ record.phone }}</li>
+                <li class="list-group-item">{{ record.address }}</li>
+                <li class="list-group-item">{{ record.city }}</li>
+                <li class="list-group-item">{{ record.state }}</li>
+                <li class="list-group-item">{{ record.zipcode }}</li>
+                <li class="list-group-item">{{ record.created_at }}</li>
+                <li class="list-group-item">{{ record.id }}</li>
+              </ul>
+            </div>
+            <a type="button" href="{% url 'home' %}" class="btn btn-primary mt-3">Back</a>
+            <a type="button" href="{% url 'delete_record' record.id %}" class="btn btn-danger mt-3">Delete</a>
+        </div>
+    {% endif %}
+{% endblock %}
