@@ -20,6 +20,7 @@
             </div>
             <a type="button" href="{% url 'home' %}" class="btn btn-primary mt-3">Back</a>
             <a type="button" href="{% url 'delete_record' record.id %}" class="btn btn-danger mt-3">Delete</a>
+            <a type="button" href="{% url 'edit_record' record.id %}" class="btn btn-secondary mt-3">Edit</a>
         </div>
     {% endif %}
 {% endblock %}

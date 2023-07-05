@@ -2,8 +2,9 @@ from django.core.handlers.wsgi import WSGIRequest
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
-from .forms import SignUpForm
+from .forms import SignUpForm, AddRecordForm
 from .models import Record
+
 
 def home(request: WSGIRequest):
     if request.method == "POST":
@@ -15,7 +16,8 @@ def home(request: WSGIRequest):
             messages.success(request, "You have logged in.")
             return redirect('home')
         else:
-            messages.success(request, "There was an error logging in, try again.")
+            messages.success(
+                request, "There was an error logging in, try again.")
             return redirect('home')
     else:
         records = Record.objects.all()
@@ -25,10 +27,13 @@ def home(request: WSGIRequest):
 # If you need separate login page so you need this function
 # def login_user(request):
 #     pass
+
+
 def logout_user(request: WSGIRequest):
     logout(request)
     messages.success(request, "You have been logged out.")
     return redirect('home')
+
 
 def register_user(request: WSGIRequest):
     if request.method == "POST":
@@ -48,6 +53,7 @@ def register_user(request: WSGIRequest):
         return render(request, 'register.html', {'form': form})
     return render(request, 'register.html', {'form': form})
 
+
 def customer_record(request: WSGIRequest, pk: int):
     if request.user.is_authenticated:
         customer_record = Record.objects.get(id=pk)
@@ -55,6 +61,7 @@ def customer_record(request: WSGIRequest, pk: int):
     else:
         messages.success(request, "You must been login to view this page")
         return redirect('home')
+
 
 def delete_record(request: WSGIRequest, pk: int):
     if request.user.is_authenticated:
@@ -66,5 +73,29 @@ def delete_record(request: WSGIRequest, pk: int):
         messages.success(request, "You must been login to to do that")
         return redirect('home')
 
+
 def add_record(request: WSGIRequest):
-    return render(request, 'add_record.html', {})
+    form = AddRecordForm(request.POST or None)
+    if request.user.is_authenticated:
+        if all((request.method == "POST", form.is_valid())):
+            form.save()
+            messages.success(request, "Record added.")
+            return redirect('home')
+        return render(request, 'add_record.html', {'form': form})
+    else:
+        messages.success(request, "You must been login to do that")
+        return redirect('home')
+
+
+def edit_record(request: WSGIRequest, pk: int):
+    if request.user.is_authenticated:
+        record = Record.objects.get(id=pk)
+        form = AddRecordForm(request.POST or None, instance=record)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Record updated.")
+            return redirect('home')
+        return render(request, 'edit_record.html', {'form': form})
+    else:
+        messages.success(request, "You must been login to do that")
+        return redirect('home')
